@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Info</title>
+</head>
+<body>
+  <h1>Student Information</h1>
+  <button onclick="getStudents()">Get Students</button>
+  <button onclick="addStudent()">Add Student</button>
+  <pre id="output"></pre>
+
+  <script>
+    async function getStudents() {
+      const response = await fetch('/.netlify/functions/student');
+      const data = await response.json();
+      document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+    }
+
+    async function addStudent() {
+      const newStudent = { id: 3, name: "Alice Johnson", age: 21 };
+      const response = await fetch('/.netlify/functions/student', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newStudent)
+      });
+      const data = await response.json();
+      document.getElementById('output').textContent = JSON.stringify(data, null, 2);
+    }
+  </script>
+</body>
+</html>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hello World Function</title>
+    <title>Secure Site</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -19,27 +19,52 @@
             color: red;
         }
     </style>
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
-    <h1>Hello World Function</h1>
-    <button id="callFunction">Call Function</button>
+    <h1>Secure Site</h1>
+    <button id="login">Login</button>
+    <button id="logout" style="display:none;">Logout</button>
     <div id="output" class="result"></div>
 
     <script>
-        document.getElementById('callFunction').addEventListener('click', async () => {
-            const output = document.getElementById('output');
-            output.innerHTML = 'Loading...';
+        // Initialize Netlify Identity
+        netlifyIdentity.init();
 
-            try {
-                const response = await fetch('/.netlify/functions/hello');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.text();
-                output.innerHTML = `<pre>${data}</pre>`;
-            } catch (error) {
-                output.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+        // Show login or logout button based on authentication status
+        netlifyIdentity.on('init', user => {
+            if (user) {
+                document.getElementById('login').style.display = 'none';
+                document.getElementById('logout').style.display = 'block';
+            } else {
+                document.getElementById('login').style.display = 'block';
+                document.getElementById('logout').style.display = 'none';
             }
+        });
+
+        // Handle login button click
+        document.getElementById('login').addEventListener('click', () => {
+            netlifyIdentity.open();
+        });
+
+        // Handle logout button click
+        document.getElementById('logout').addEventListener('click', () => {
+            netlifyIdentity.logout();
+        });
+
+        // Handle login event
+        netlifyIdentity.on('login', user => {
+            document.getElementById('login').style.display = 'none';
+            document.getElementById('logout').style.display = 'block';
+            document.getElementById('output').innerHTML = `<pre>Welcome, ${user.email}</pre>`;
+            netlifyIdentity.close();
+        });
+
+        // Handle logout event
+        netlifyIdentity.on('logout', () => {
+            document.getElementById('login').style.display = 'block';
+            document.getElementById('logout').style.display = 'none';
+            document.getElementById('output').innerHTML = '';
         });
     </script>
 </body>
